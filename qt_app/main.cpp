@@ -1,21 +1,8 @@
-#include <QCoreApplication>
-#include <QDateTime>
-#include <QDebug>
-#include <QTimer>
+#include "app.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+	app _app(argc, argv);
 
-    QTimer tmr;
-
-    QObject::connect(&tmr, &QTimer::timeout, []()
-    {
-        static quint32 counter;
-        qDebug() << QDateTime::currentDateTimeUtc() << "hello world" << counter++;
-    });
-
-    tmr.start(500);
-
-    return a.exec();
+	return _app.exec();
 }
