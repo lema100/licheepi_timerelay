@@ -20,13 +20,14 @@ std::function<void(void)> api::get_func(endpoint_base::config conf)
 	return [this, conf]()
 	{
 		_logger->debug() << QString("From %1:%2 method: %3 url: %4")
-						  .arg(_req->remoteAddress().toUtf8().constData())
-						  .arg(_req->remotePort())
-						  .arg(qhttp::Stringify::toString(_req->method()))
-						  .arg(_req->url().path());
+							.arg(_req->remoteAddress().toUtf8().constData())
+							.arg(_req->remotePort())
+							.arg(qhttp::Stringify::toString(_req->method()))
+							.arg(_req->url().toString());
+
 		for (auto const & el : _list)
 		{
-			if (el->path().startsWith(_req->url().path()))
+			if (el->path() == _req->url().path())
 			{
 				if (el->methods().contains(_req->method()))
 				{

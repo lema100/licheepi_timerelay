@@ -5,6 +5,9 @@ CONFIG -= app_bundle
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
+QMAKE_CFLAGS_RELEASE = -O3
+QMAKE_CXXFLAGS_RELEASE = -O3
+
 CONFIG(debug, debug|release) {
     DESTDIR = ../bin/debug
 } else

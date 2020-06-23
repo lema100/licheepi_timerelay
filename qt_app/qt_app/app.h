@@ -15,7 +15,7 @@
 #include "api.h"
 
 #define VERSION "v.1.0b"
-#define DESCRIBE "Lema embedded base timerelay"
+#define DESCRIBE "Embedded base timerelay"
 
 class app : public QCoreApplication
 {

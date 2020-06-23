@@ -50,12 +50,12 @@ app::app(int argc, char *argv[]) :
 void app::on_timeout(void)
 {
 	qDebug() << QTime::currentTime();
-	for (const auto & i : _relay_config)
+	for (const auto & relay : _relay_config)
 	{
-		qDebug() << i.gpio << i.mode;
-		for (const auto & j : i.timeline.keys())
+		qDebug() << relay.gpio << relay.mode;
+		for (const auto & point : relay.timeline.keys())
 		{
-			qDebug() << j << i.timeline[j];
+			qDebug() << point << relay.timeline[point];
 		}
 	}
 }
