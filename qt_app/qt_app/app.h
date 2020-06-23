@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QCommandLineOption>
 #include <QCommandLineParser>
+#include <QNetworkProxyFactory>
 #include <QFileInfo>
 #include <QObject>
 #include <QDebug>
@@ -11,6 +12,7 @@
 
 #include "gpio.h"
 #include "env.h"
+#include "api.h"
 
 #define VERSION "v.1.0b"
 #define DESCRIBE "Lema embedded base timerelay"
@@ -25,6 +27,7 @@ public:
 
 private:
 	QCommandLineParser _args;
+	http::QHttpServer _httpServer;
 	QTimer _everySec;
 
 	bool args(void);

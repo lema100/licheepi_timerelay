@@ -3,6 +3,8 @@
 
 #include <QFile>
 
+#define NO_GPIO
+
 class gpio
 {
 public:

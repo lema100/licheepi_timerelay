@@ -1,3 +1,4 @@
+#include "endpoints.h"
 #include "app.h"
 
 bool app::args()
@@ -22,8 +23,27 @@ app::app(int argc, char *argv[]) :
 	_env(_args.value("c")),
 	_relay_config(_env.get_relay())
 {
-	QObject::connect(&_everySec, &QTimer::timeout, this, &app::on_timeout);
+	QNetworkProxyFactory::setUseSystemConfiguration(_args.isSet("use-system-proxy"));
 
+	_listen_state = _httpServer.listen(_env.get_http_port(), [this](http::QHttpRequest * req, http::QHttpResponse * res)
+	{
+		QList<std::shared_ptr<endpoint_base>> list = {
+			std::make_shared<TestEnpoint>(),
+			std::make_shared<HelloEndpoint>(),
+			std::make_shared<SelfKillEndpoint>(),
+		};
+		new api(req, res, _env.get_logger(), _env.get_endpoint_conf(), list);
+	});
+
+	auto str = QString("HTTP listen on %1 port start %2").arg(_env.get_http_port()).arg(_listen_state ? "OK" : "FALSE");
+	qDebug() << str;
+
+	if (_listen_state)
+		_env.get_logger()->debug() << str;
+	else
+		_env.get_logger()->error() << str;
+
+	QObject::connect(&_everySec, &QTimer::timeout, this, &app::on_timeout);
 	_everySec.start(1000);
 }
 

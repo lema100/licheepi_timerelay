@@ -10,20 +10,30 @@ gpio::~gpio()
 
 static void f_write(QString filename, QString data)
 {
+#ifndef NO_GPIO
 	QFile f(filename);
 	f.open(QIODevice::WriteOnly);
 	f.write(data.toLatin1());
 	f.close();
+#else
+	(void) filename;
+	(void) data;
+#endif
 }
 
 static QString f_read(QString filename)
 {
+#ifndef NO_GPIO
 	QFile f(filename);
 	f.open(QIODevice::ReadOnly);
 	auto data = f.readAll();
 	f.close();
 
 	return QString(data);
+#else
+	(void) filename;
+	return "0";
+#endif
 }
 
 bool gpio::get_value(int num)

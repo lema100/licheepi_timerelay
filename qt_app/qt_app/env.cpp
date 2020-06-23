@@ -84,3 +84,19 @@ global_conf env::get_global(void)
 
 	return ret;
 }
+
+endpoint_base::config env::get_endpoint_conf(void)
+{
+	endpoint_base::config ret;
+
+	settings.beginGroup("ENDPOINTS");
+
+	settings.endGroup();
+
+	return ret;
+}
+
+QString env::get_http_port(void)
+{
+	return settings.value("HTTP_PORT", "8000").toString();
+}
