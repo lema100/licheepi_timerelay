@@ -3,7 +3,7 @@
 
 #include <QFile>
 
-#define NO_GPIO
+//#define NO_GPIO
 
 class gpio
 {

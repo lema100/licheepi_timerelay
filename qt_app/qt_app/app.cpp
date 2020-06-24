@@ -25,6 +25,12 @@ app::app(int argc, char *argv[]) :
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(_args.isSet("use-system-proxy"));
 
+	setenv("VAR", "12345", true);
+
+//	putenv("TZ=UTC-3");
+//	setenv("TZ", _env.get_global().timezone.toLatin1(), 1);
+//	QProcess::execute(QString("export"), QStringList(QString("TZ=%1").arg(_env.get_global().timezone)));
+
 	_listen_state = _httpServer.listen(_env.get_http_port(), [this](http::QHttpRequest * req, http::QHttpResponse * res)
 	{
 		QList<std::shared_ptr<endpoint_base>> list = {
@@ -49,13 +55,39 @@ app::app(int argc, char *argv[]) :
 
 void app::on_timeout(void)
 {
-	qDebug() << QTime::currentTime();
+//	qDebug() << QTime::currentTime();
 	for (const auto & relay : _relay_config)
 	{
-		qDebug() << relay.gpio << relay.mode;
-		for (const auto & point : relay.timeline.keys())
+//		qDebug() << relay.gpio << relay.mode;
+		switch (relay.mode)
 		{
-			qDebug() << point << relay.timeline[point];
+		case TIME:
+		{
+			auto curr_time = QTime::currentTime();
+			auto points = relay.timeline.keys();
+			if (points.count() > 1)
+			{
+				bool state = relay.timeline.last();
+				for (const auto & point : points)
+				{
+					if (curr_time > point)
+						state = relay.timeline[point];
+					else
+						break;
+				}
+				gpio::set_value(relay.gpio, state);
+			}
+			else if (points.count() == 1)
+				gpio::set_value(relay.gpio, relay.timeline.last());
+			else
+				gpio::set_value(relay.gpio, 0);
+			break;
+		}
+		case OFF:
+		case MANUAL:
+		case PULSE:
+		default:
+			gpio::set_value(relay.gpio, 0);
 		}
 	}
 }

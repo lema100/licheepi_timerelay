@@ -4,5 +4,8 @@ int main(int argc, char *argv[])
 {
 	app _app(argc, argv);
 
-	return _app.exec();
+	if (_app.get_http_state())
+		_app.exec();
+
+	return 0;
 }

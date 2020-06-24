@@ -6,6 +6,7 @@
 #include <QCommandLineParser>
 #include <QNetworkProxyFactory>
 #include <QFileInfo>
+#include <QProcess>
 #include <QObject>
 #include <QDebug>
 #include <QTimer>
@@ -23,6 +24,7 @@ class app : public QCoreApplication
 
 public:
 	app(int argc, char *argv[]);
+	bool get_http_state(void){ return _listen_state; }
 	~app();
 
 private:
