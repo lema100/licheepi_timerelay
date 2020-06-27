@@ -25,11 +25,7 @@ app::app(int argc, char *argv[]) :
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(_args.isSet("use-system-proxy"));
 
-	setenv("VAR", "12345", true);
-
-//	putenv("TZ=UTC-3");
-//	setenv("TZ", _env.get_global().timezone.toLatin1(), 1);
-//	QProcess::execute(QString("export"), QStringList(QString("TZ=%1").arg(_env.get_global().timezone)));
+	QProcess::execute(QString("ln -sf /usr/share/zoneinfo/uclibc/%1 /etc/TZ").arg(_env.get_global().timezone));
 
 	_listen_state = _httpServer.listen(_env.get_http_port(), [this](http::QHttpRequest * req, http::QHttpResponse * res)
 	{
@@ -56,7 +52,7 @@ app::app(int argc, char *argv[]) :
 void app::on_timeout(void)
 {
 //	qDebug() << QTime::currentTime();
-	for (const auto & relay : _relay_config)
+	for (const relay_cfg & relay : _relay_config)
 	{
 //		qDebug() << relay.gpio << relay.mode;
 		switch (relay.mode)
@@ -79,6 +75,24 @@ void app::on_timeout(void)
 			}
 			else if (points.count() == 1)
 				gpio::set_value(relay.gpio, relay.timeline.last());
+			else
+				gpio::set_value(relay.gpio, 0);
+			break;
+		}
+		case PWM:
+		{
+			int curr_time = QTime::currentTime().msecsSinceStartOfDay();
+
+			if (relay.pulse_on != 0 && relay.pulse_off != 0)
+			{
+				int period = relay.pulse_on + relay.pulse_off;
+				int pulse_count = curr_time / period;
+				curr_time -= pulse_count * period;
+				if (curr_time > relay.pulse_on)
+					gpio::set_value(relay.gpio, 0);
+				else
+					gpio::set_value(relay.gpio, 1);
+			}
 			else
 				gpio::set_value(relay.gpio, 0);
 			break;

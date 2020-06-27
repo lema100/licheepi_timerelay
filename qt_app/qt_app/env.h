@@ -13,6 +13,7 @@ enum relay_mode_t
 	TIME,
 	MANUAL,
 	PULSE,
+	PWM,
 };
 
 struct relay_cfg
@@ -20,10 +21,12 @@ struct relay_cfg
 	int gpio;
 	relay_mode_t mode;
 	QMap<QTime, bool> timeline;
+	int pulse_on, pulse_off;
 };
 
 struct global_conf
 {
+	int gpio_red, gpio_green;
 	int relay_count;
 	QString timezone;
 };

@@ -35,6 +35,7 @@ QVector<relay_cfg> env::get_relay(void)
 		{ "TIME", relay_mode_t::TIME },
 		{ "MANUAL", relay_mode_t::MANUAL },
 		{ "PULSE", relay_mode_t::PULSE },
+		{ "PWM", relay_mode_t::PWM },
 	};
 
 	int count = settings.value("RELAY_COUNT", 0).toInt();
@@ -45,6 +46,8 @@ QVector<relay_cfg> env::get_relay(void)
 
 		tmp.mode = sting_to_mode[settings.value("MODE", "OFF").toString()];
 		tmp.gpio = settings.value("GPIO", 0).toInt();
+		tmp.pulse_off = settings.value("PULSE_OFF", 0).toInt() * 1000;
+		tmp.pulse_on = settings.value("PULSE_ON", 0).toInt() * 1000;
 
 		tmp.timeline.clear();
 		auto time_str = settings.value("TIMELINE", "00:00:00.OFF").toString().split(",");
@@ -73,6 +76,8 @@ void env::set_global(global_conf conf)
 {
 	settings.setValue("RELAY_COUNT", conf.relay_count);
 	settings.setValue("TIMEZONE", conf.timezone);
+	settings.setValue("GPIO_RED", conf.gpio_red);
+	settings.setValue("GPIO_GREEN", conf.gpio_green);
 }
 
 global_conf env::get_global(void)
@@ -81,6 +86,8 @@ global_conf env::get_global(void)
 
 	ret.relay_count = settings.value("RELAY_COUNT", 0).toInt();
 	ret.timezone = settings.value("TIMEZONE", "UTC").toString();
+	ret.gpio_red = settings.value("GPIO_RED", 0).toInt();
+	ret.gpio_green = settings.value("GPIO_GREEN", 0).toInt();
 
 	return ret;
 }
