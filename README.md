@@ -1,1 +1,3 @@
-# emb_timerelay
+# Licheepi Timerelay
+
+Run ./build.sh
