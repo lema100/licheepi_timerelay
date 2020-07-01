@@ -11,7 +11,7 @@ bool app::args()
 	_args.setApplicationDescription(DESCRIBE);
 	_args.addHelpOption();
 	_args.addVersionOption();
-	_args.addOption(QCommandLineOption("c", QString("Config file (%1.ini by default)").arg(inst_name), "config", inst_name));
+	_args.addOption(QCommandLineOption("c", QString("Config file (%1.ini by default)").arg(inst_name), "config", inst_name + ".ini"));
 	_args.addOption(QCommandLineOption("use-system-proxy", "Use system proxy for network connection"));
 	_args.process(*this);
 	return true;
@@ -24,7 +24,6 @@ app::app(int argc, char *argv[]) :
 	_relay_config(_env.get_relay())
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(_args.isSet("use-system-proxy"));
-
 	QProcess::execute(QString("ln -sf /usr/share/zoneinfo/uclibc/%1 /etc/TZ").arg(_env.get_global().timezone));
 
 	_listen_state = _httpServer.listen(_env.get_http_port(), [this](http::QHttpRequest * req, http::QHttpResponse * res)
