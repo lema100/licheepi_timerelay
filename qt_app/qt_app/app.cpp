@@ -50,6 +50,11 @@ app::app(int argc, char *argv[]) :
 
 void app::on_timeout(void)
 {
+	static bool led_state;
+	led_state = !led_state;
+	gpio::set_value(_env.get_global().gpio_green, led_state);
+	gpio::set_value(_env.get_global().gpio_red, 0);
+
 //	qDebug() << QTime::currentTime();
 	for (const relay_cfg & relay : _relay_config)
 	{
@@ -96,9 +101,9 @@ void app::on_timeout(void)
 				gpio::set_value(relay.gpio, 0);
 			break;
 		}
-		case OFF:
-		case MANUAL:
 		case PULSE:
+		case MANUAL:
+		case OFF:
 		default:
 			gpio::set_value(relay.gpio, 0);
 		}
