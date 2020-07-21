@@ -5,7 +5,6 @@
 #include <QVector>
 #include <QDebug>
 #include "logger.h"
-#include "endpoint_base.h"
 
 enum relay_mode_t
 {
@@ -14,6 +13,10 @@ enum relay_mode_t
 	MANUAL,
 	PULSE,
 	PWM,
+};
+
+struct endpoint_config
+{
 };
 
 struct relay_cfg
@@ -40,7 +43,7 @@ public:
 	QVector<relay_cfg> get_relay(void);
 	void set_relay(QVector<relay_cfg>);
 
-	endpoint_base::config get_endpoint_conf(void);
+	endpoint_config get_endpoint_conf(void);
 	QString get_http_port(void);
 
 	void set_global(global_conf);

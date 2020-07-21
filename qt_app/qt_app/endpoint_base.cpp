@@ -63,13 +63,14 @@ void endpoint_base::res_error(http::QHttpResponse * _res, QString msg)
 	_res->end(jDoc_error(msg));
 }
 
-void endpoint_base::set_config(config conf)
+void endpoint_base::set_config(env * __env)
 {
-	_conf = conf;
+	_env = __env;
 }
 
 void endpoint_base::parse_query(http::QHttpRequest * _req)
 {
+	_body = _req->collectedData();
 	auto query = _req->url().query();
 	for (const auto & param : query.split("&"))
 	{

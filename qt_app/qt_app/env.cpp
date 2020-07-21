@@ -92,9 +92,9 @@ global_conf env::get_global(void)
 	return ret;
 }
 
-endpoint_base::config env::get_endpoint_conf(void)
+endpoint_config env::get_endpoint_conf(void)
 {
-	endpoint_base::config ret;
+	endpoint_config ret;
 
 	settings.beginGroup("ENDPOINTS");
 

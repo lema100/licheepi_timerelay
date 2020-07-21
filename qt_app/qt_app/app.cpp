@@ -32,8 +32,9 @@ app::app(int argc, char *argv[]) :
 			std::make_shared<TestEnpoint>(),
 			std::make_shared<HelloEndpoint>(),
 			std::make_shared<SelfKillEndpoint>(),
+			std::make_shared<SettingEnpoint>(),
 		};
-		new api(req, res, _env.get_logger(), _env.get_endpoint_conf(), list);
+		new api(req, res, &_env, list);
 	});
 
 	auto str = QString("HTTP listen on %1 port start %2").arg(_env.get_http_port()).arg(_listen_state ? "OK" : "FALSE");

@@ -9,6 +9,21 @@
 
 #include "endpoint_base.h"
 
+class SettingEnpoint : public endpoint_base
+{
+public:
+	result get(void) override;
+	result post(void) override;
+	QList<qhttp::THttpMethod> methods(void) override
+	{
+		return {qhttp::THttpMethod::EHTTP_GET, qhttp::THttpMethod::EHTTP_POST};
+	}
+	QString path(void) override
+	{
+		return "/setting";
+	}
+};
+
 class TestEnpoint : public endpoint_base
 {
 public:

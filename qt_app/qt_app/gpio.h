@@ -2,8 +2,9 @@
 #define GPIO_H
 
 #include <QFile>
+#include <QMAp>
 
-//#define NO_GPIO
+#define NO_GPIO
 
 class gpio
 {
@@ -13,7 +14,6 @@ public:
 
 	static bool get_value(int num);
 	static void set_value(int num, bool state);
-
 };
 
 #endif // GPIO_H

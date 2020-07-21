@@ -2,22 +2,22 @@
 
 api::api(http::QHttpRequest * req,
 		 http::QHttpResponse * res,
-		 logger * logg,
-		 endpoint_base::config endpoint_conf,
+		 env * __env,
 		 QList<std::shared_ptr<endpoint_base>> list) :
 	QObject(req),
-	_logger(logg),
+	_env(__env),
+	_logger(_env->get_logger()),
 	_req(req),
 	_res(res),
 	_list(list)
 {
 	req->collectData(-1);
-	req->onEnd(get_func(endpoint_conf));
+	req->onEnd(get_func());
 }
 
-std::function<void(void)> api::get_func(endpoint_base::config conf)
+std::function<void(void)> api::get_func(void)
 {
-	return [this, conf]()
+	return [this]() mutable
 	{
 		_logger->debug() << QString("From %1:%2 method: %3 url: %4")
 							.arg(_req->remoteAddress().toUtf8().constData())
@@ -33,7 +33,7 @@ std::function<void(void)> api::get_func(endpoint_base::config conf)
 				{
 					endpoint_base::result res;
 					el->parse_query(_req);
-					el->set_config(conf);
+					el->set_config(_env);
 
 					switch(_req->method())
 					{

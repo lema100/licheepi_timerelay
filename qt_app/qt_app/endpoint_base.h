@@ -11,6 +11,8 @@
 #include "../qhttp/qhttpserverrequest.hpp"
 #include "../qhttp/qhttpserver.hpp"
 
+#include "env.h"
+
 namespace http = qhttp::server;
 
 class endpoint_base
@@ -23,14 +25,10 @@ public:
 		QByteArray _body;
 	};
 	
-	struct config
-	{
-	};
-
 	endpoint_base();
 	~endpoint_base();
 
-	void set_config(config conf);
+	void set_config(env * __env);
 
 	virtual void parse_query(http::QHttpRequest * _req);
 
@@ -51,7 +49,8 @@ public:
 
 protected:
 	QMap<QString, QStringList> _args;
-	config _conf;
+	QByteArray _body;
+	env * _env;
 };
 
 #endif // ENDPOINT_BASE_H
