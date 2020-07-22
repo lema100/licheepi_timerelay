@@ -48,6 +48,7 @@ public:
 	static void res_error(http::QHttpResponse * _res, QString msg);
 
 protected:
+	QString _path;
 	QMap<QString, QStringList> _args;
 	QByteArray _body;
 	env * _env;

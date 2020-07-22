@@ -1,5 +1,34 @@
 #include "endpoints.h"
 
+endpoint_base::result StaticEnpoint::get(void)
+{
+	auto filePath = _path.mid(path().length());
+	if (!filePath.contains(".."))
+	{
+		if (filePath.isEmpty())
+			filePath = "index.html";
+
+		QFile file("static/" + filePath);
+
+		if (file.open(QIODevice::ReadOnly))
+		{
+			QByteArray fdata = file.readAll();
+			QMap<QString, QString> headers;
+			QFileInfo fi(file);
+			if (fi.fileName().endsWith("js"))
+				headers["content-type"] = "application/javascript";
+			if (fi.fileName().endsWith("html"))
+				headers["content-type"] = "text/html;charset=utf-8";
+			if (fi.fileName().endsWith("css"))
+				headers["content-type"] = "text/css";
+
+			return {qhttp::TStatusCode::ESTATUS_OK, headers, fdata};
+		}
+	}
+
+	return {qhttp::TStatusCode::ESTATUS_NOT_FOUND, {}, jDoc_error("Unavailable path: " + filePath)};
+}
+
 endpoint_base::result SettingEnpoint::get(void)
 {
 	QJsonObject jObj;
@@ -9,6 +38,7 @@ endpoint_base::result SettingEnpoint::get(void)
 	jObj["GPIO red led"] = conf.gpio_red;
 	jObj["Relay count"] = conf.relay_count;
 	jObj["Timezone"] = conf.timezone;
+	jObj["HTTP port"] = conf.http_port;
 
 	return {qhttp::TStatusCode::ESTATUS_OK, {}, jDoc_data(jObj)};
 }
@@ -26,6 +56,8 @@ endpoint_base::result SettingEnpoint::post(void)
 		conf.relay_count = jObj["Relay count"].toInt();
 	if (jObj.contains("Timezone"))
 		conf.timezone = jObj["Timezone"].toString();
+	if (jObj.contains("HTTP port"))
+		conf.http_port = jObj["HTTP port"].toInt();
 	_env->set_global(conf);
 
 	return {qhttp::TStatusCode::ESTATUS_OK, {}, jDoc_data(jObj)};

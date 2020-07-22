@@ -9,6 +9,20 @@
 
 #include "endpoint_base.h"
 
+class StaticEnpoint : public endpoint_base
+{
+public:
+	result get(void) override;
+	QList<qhttp::THttpMethod> methods(void) override
+	{
+		return {qhttp::THttpMethod::EHTTP_GET};
+	}
+	QString path(void) override
+	{
+		return "/";
+	}
+};
+
 class SettingEnpoint : public endpoint_base
 {
 public:
@@ -20,7 +34,7 @@ public:
 	}
 	QString path(void) override
 	{
-		return "/setting";
+		return "/api/setting";
 	}
 };
 
@@ -34,7 +48,7 @@ public:
 	}
 	QString path(void) override
 	{
-		return "/test";
+		return "/api/test";
 	}
 };
 
@@ -48,7 +62,7 @@ public:
 	}
 	QString path(void) override
 	{
-		return "/hello";
+		return "/api/hello";
 	}
 };
 
@@ -62,7 +76,7 @@ public:
 	}
 	QString path(void) override
 	{
-		return "/selfkill";
+		return "/api/selfkill";
 	}
 };
 

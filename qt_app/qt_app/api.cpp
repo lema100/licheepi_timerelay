@@ -27,7 +27,7 @@ std::function<void(void)> api::get_func(void)
 
 		for (auto const & el : _list)
 		{
-			if (el->path() == _req->url().path())
+			if (_req->url().path().startsWith(el->path()))
 			{
 				if (el->methods().contains(_req->method()))
 				{

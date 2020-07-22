@@ -26,18 +26,19 @@ app::app(int argc, char *argv[]) :
 	QNetworkProxyFactory::setUseSystemConfiguration(_args.isSet("use-system-proxy"));
 	QProcess::execute(QString("ln -sf /usr/share/zoneinfo/uclibc/%1 /etc/TZ").arg(_env.get_global().timezone));
 
-	_listen_state = _httpServer.listen(_env.get_http_port(), [this](http::QHttpRequest * req, http::QHttpResponse * res)
+	_listen_state = _httpServer.listen(QString::number(_env.get_global().http_port), [this](http::QHttpRequest * req, http::QHttpResponse * res)
 	{
 		QList<std::shared_ptr<endpoint_base>> list = {
 			std::make_shared<TestEnpoint>(),
 			std::make_shared<HelloEndpoint>(),
 			std::make_shared<SelfKillEndpoint>(),
 			std::make_shared<SettingEnpoint>(),
+			std::make_shared<StaticEnpoint>(),
 		};
 		new api(req, res, &_env, list);
 	});
 
-	auto str = QString("HTTP listen on %1 port start %2").arg(_env.get_http_port()).arg(_listen_state ? "OK" : "FALSE");
+	auto str = QString("HTTP listen on %1 port start %2").arg(_env.get_global().http_port).arg(_listen_state ? "OK" : "FALSE");
 	qDebug() << str;
 
 	if (_listen_state)

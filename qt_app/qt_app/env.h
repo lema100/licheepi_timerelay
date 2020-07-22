@@ -32,6 +32,7 @@ struct global_conf
 	int gpio_red, gpio_green;
 	int relay_count;
 	QString timezone;
+	int http_port;
 };
 
 class env
@@ -44,7 +45,6 @@ public:
 	void set_relay(QVector<relay_cfg>);
 
 	endpoint_config get_endpoint_conf(void);
-	QString get_http_port(void);
 
 	void set_global(global_conf);
 	global_conf get_global(void);

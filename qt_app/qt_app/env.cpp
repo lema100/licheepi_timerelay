@@ -1,4 +1,4 @@
-#include "env.h"
+ #include "env.h"
 
 env::env(const QString & iniFile) : settings(iniFile, QSettings::IniFormat, nullptr)
 {
@@ -78,6 +78,7 @@ void env::set_global(global_conf conf)
 	settings.setValue("TIMEZONE", conf.timezone);
 	settings.setValue("GPIO_RED", conf.gpio_red);
 	settings.setValue("GPIO_GREEN", conf.gpio_green);
+	settings.setValue("HTTP_PORT", conf.http_port);
 }
 
 global_conf env::get_global(void)
@@ -88,6 +89,7 @@ global_conf env::get_global(void)
 	ret.timezone = settings.value("TIMEZONE", "UTC").toString();
 	ret.gpio_red = settings.value("GPIO_RED", 0).toInt();
 	ret.gpio_green = settings.value("GPIO_GREEN", 0).toInt();
+	ret.http_port = settings.value("HTTP_PORT", 8000).toInt();
 
 	return ret;
 }
@@ -101,9 +103,4 @@ endpoint_config env::get_endpoint_conf(void)
 	settings.endGroup();
 
 	return ret;
-}
-
-QString env::get_http_port(void)
-{
-	return settings.value("HTTP_PORT", "8000").toString();
 }

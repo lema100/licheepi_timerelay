@@ -16,7 +16,7 @@
 #include "api.h"
 
 #define VERSION "v.1.0b"
-#define DESCRIBE "Embedded base timerelay"
+#define DESCRIBE "Licheepi based timerelay"
 
 class app : public QCoreApplication
 {
