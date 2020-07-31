@@ -6,7 +6,6 @@ endpoint_base::endpoint_base()
 
 endpoint_base::~endpoint_base()
 {
-
 }
 
 QByteArray endpoint_base::jDoc_mess(QString msg, QString status)

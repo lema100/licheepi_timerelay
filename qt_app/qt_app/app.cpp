@@ -21,7 +21,7 @@ app::app(int argc, char *argv[]) :
 	QCoreApplication(argc, argv),
 	_args_init(args()),
 	_env(_args.value("c")),
-	_relay_config(_env.get_relay())
+	_relay(_env.get_relay())
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(_args.isSet("use-system-proxy"));
 	QProcess::execute(QString("ln -sf /usr/share/zoneinfo/uclibc/%1 /etc/TZ").arg(_env.get_global().timezone));
@@ -53,62 +53,62 @@ app::app(int argc, char *argv[]) :
 
 void app::on_timeout(void)
 {
-	_relay_config = _env.get_relay();
+	_relay = _env.get_relay();
 //	qDebug() << QTime::currentTime();
-	for (const auto & i : _relay_config.keys())
+	for (const auto & i : _relay.keys())
 	{
 //		qDebug() << relay.gpio << relay.mode;
-		switch (_relay_config[i].mode)
+		switch (_relay[i].mode)
 		{
 		case TIME:
 		{
 			auto curr_time = QTime::currentTime();
-			auto points = _relay_config[i].timeline.keys();
+			auto points = _relay[i].timeline.keys();
 			if (points.count() > 1)
 			{
-				bool state = _relay_config[i].timeline.last();
+				bool state = _relay[i].timeline.last();
 				for (const auto & point : points)
 				{
 					if (curr_time > point)
-						state = _relay_config[i].timeline[point];
+						state = _relay[i].timeline[point];
 					else
 						break;
 				}
-				gpio::set_value(_relay_config[i].gpio, state);
+				gpio::set_value(_relay[i].gpio, state);
 			}
 			else if (points.count() == 1)
-				gpio::set_value(_relay_config[i].gpio, _relay_config[i].timeline.last());
+				gpio::set_value(_relay[i].gpio, _relay[i].timeline.last());
 			else
-				gpio::set_value(_relay_config[i].gpio, 0);
+				gpio::set_value(_relay[i].gpio, 0);
 			break;
 		}
 		case PWM:
 		{
 			int curr_time = QTime::currentTime().msecsSinceStartOfDay();
 
-			if (_relay_config[i].pulse_on != 0 && _relay_config[i].pulse_off != 0)
+			if (_relay[i].pulse_on != 0 && _relay[i].pulse_off != 0)
 			{
-				int period = _relay_config[i].pulse_on + _relay_config[i].pulse_off;
+				int period = _relay[i].pulse_on + _relay[i].pulse_off;
 				int pulse_count = curr_time / period;
 				curr_time -= pulse_count * period;
-				if (curr_time > _relay_config[i].pulse_on)
-					gpio::set_value(_relay_config[i].gpio, 0);
+				if (curr_time > _relay[i].pulse_on)
+					gpio::set_value(_relay[i].gpio, 0);
 				else
-					gpio::set_value(_relay_config[i].gpio, 1);
+					gpio::set_value(_relay[i].gpio, 1);
 			}
 			else
-				gpio::set_value(_relay_config[i].gpio, 0);
+				gpio::set_value(_relay[i].gpio, 0);
 			break;
 		}
 		case MANUAL:
 		{
-			gpio::set_value(_relay_config[i].gpio, _relay_config[i].state);
+			gpio::set_value(_relay[i].gpio, _relay[i].state);
 			break;
 		}
 		case PULSE:
 		case OFF:
 		default:
-			gpio::set_value(_relay_config[i].gpio, 0);
+			gpio::set_value(_relay[i].gpio, 0);
 		}
 	}
 
