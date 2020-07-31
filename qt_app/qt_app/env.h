@@ -22,6 +22,7 @@ struct endpoint_config
 struct relay_cfg
 {
 	int gpio;
+	bool state;
 	relay_mode_t mode;
 	QMap<QTime, bool> timeline;
 	int pulse_on, pulse_off;
@@ -41,14 +42,23 @@ public:
 	env(const QString & iniFile);
 	~env();
 
-	QVector<relay_cfg> get_relay(void);
-	void set_relay(QVector<relay_cfg>);
+	QMap<int, relay_cfg> get_relay(void);
+	void set_relay(QMap<int, relay_cfg>);
 
 	endpoint_config get_endpoint_conf(void);
 
 	void set_global(global_conf);
 	global_conf get_global(void);
 	logger * get_logger(void);
+
+	const QMap<QString, relay_mode_t> sting_to_relay_mode =
+	{
+		{ "OFF", relay_mode_t::OFF },
+		{ "TIME", relay_mode_t::TIME },
+		{ "MANUAL", relay_mode_t::MANUAL },
+		{ "PULSE", relay_mode_t::PULSE },
+		{ "PWM", relay_mode_t::PWM },
+	};
 
 private:
 	QSettings settings;

@@ -36,7 +36,7 @@ private:
 	bool _args_init;
 	bool _listen_state;
 	env _env;
-	QVector<relay_cfg> _relay_config;
+	QMap<int, relay_cfg> _relay_config;
 
 public slots:
 	void on_timeout(void);

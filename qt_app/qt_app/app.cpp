@@ -33,6 +33,7 @@ app::app(int argc, char *argv[]) :
 			std::make_shared<HelloEndpoint>(),
 			std::make_shared<SelfKillEndpoint>(),
 			std::make_shared<SettingEnpoint>(),
+			std::make_shared<RelayEnpoint>(),
 			std::make_shared<StaticEnpoint>(),
 		};
 		new api(req, res, &_env, list);
@@ -52,63 +53,70 @@ app::app(int argc, char *argv[]) :
 
 void app::on_timeout(void)
 {
-	static bool led_state;
-	led_state = !led_state;
-	gpio::set_value(_env.get_global().gpio_green, led_state);
-	gpio::set_value(_env.get_global().gpio_red, 0);
-
+	_relay_config = _env.get_relay();
 //	qDebug() << QTime::currentTime();
-	for (const relay_cfg & relay : _relay_config)
+	for (const auto & i : _relay_config.keys())
 	{
 //		qDebug() << relay.gpio << relay.mode;
-		switch (relay.mode)
+		switch (_relay_config[i].mode)
 		{
 		case TIME:
 		{
 			auto curr_time = QTime::currentTime();
-			auto points = relay.timeline.keys();
+			auto points = _relay_config[i].timeline.keys();
 			if (points.count() > 1)
 			{
-				bool state = relay.timeline.last();
+				bool state = _relay_config[i].timeline.last();
 				for (const auto & point : points)
 				{
 					if (curr_time > point)
-						state = relay.timeline[point];
+						state = _relay_config[i].timeline[point];
 					else
 						break;
 				}
-				gpio::set_value(relay.gpio, state);
+				gpio::set_value(_relay_config[i].gpio, state);
 			}
 			else if (points.count() == 1)
-				gpio::set_value(relay.gpio, relay.timeline.last());
+				gpio::set_value(_relay_config[i].gpio, _relay_config[i].timeline.last());
 			else
-				gpio::set_value(relay.gpio, 0);
+				gpio::set_value(_relay_config[i].gpio, 0);
 			break;
 		}
 		case PWM:
 		{
 			int curr_time = QTime::currentTime().msecsSinceStartOfDay();
 
-			if (relay.pulse_on != 0 && relay.pulse_off != 0)
+			if (_relay_config[i].pulse_on != 0 && _relay_config[i].pulse_off != 0)
 			{
-				int period = relay.pulse_on + relay.pulse_off;
+				int period = _relay_config[i].pulse_on + _relay_config[i].pulse_off;
 				int pulse_count = curr_time / period;
 				curr_time -= pulse_count * period;
-				if (curr_time > relay.pulse_on)
-					gpio::set_value(relay.gpio, 0);
+				if (curr_time > _relay_config[i].pulse_on)
+					gpio::set_value(_relay_config[i].gpio, 0);
 				else
-					gpio::set_value(relay.gpio, 1);
+					gpio::set_value(_relay_config[i].gpio, 1);
 			}
 			else
-				gpio::set_value(relay.gpio, 0);
+				gpio::set_value(_relay_config[i].gpio, 0);
+			break;
+		}
+		case MANUAL:
+		{
+			gpio::set_value(_relay_config[i].gpio, _relay_config[i].state);
 			break;
 		}
 		case PULSE:
-		case MANUAL:
 		case OFF:
 		default:
-			gpio::set_value(relay.gpio, 0);
+			gpio::set_value(_relay_config[i].gpio, 0);
 		}
+	}
+
+	{
+		static bool led_state;
+		led_state = !led_state;
+		gpio::set_value(_env.get_global().gpio_green, led_state);
+		gpio::set_value(_env.get_global().gpio_red, 0);
 	}
 }
 

@@ -24,19 +24,10 @@ logger * env::get_logger(void)
 	return _logger;
 }
 
-QVector<relay_cfg> env::get_relay(void)
+QMap<int, relay_cfg> env::get_relay(void)
 {
-	QVector<relay_cfg> ret;
+	QMap<int, relay_cfg> ret;
 	relay_cfg tmp;
-
-	QMap<QString, relay_mode_t> sting_to_mode =
-	{
-		{ "OFF", relay_mode_t::OFF },
-		{ "TIME", relay_mode_t::TIME },
-		{ "MANUAL", relay_mode_t::MANUAL },
-		{ "PULSE", relay_mode_t::PULSE },
-		{ "PWM", relay_mode_t::PWM },
-	};
 
 	int count = settings.value("RELAY_COUNT", 0).toInt();
 
@@ -44,7 +35,8 @@ QVector<relay_cfg> env::get_relay(void)
 	{
 		settings.beginGroup(QString("RELAY%1").arg(i));
 
-		tmp.mode = sting_to_mode[settings.value("MODE", "OFF").toString()];
+		tmp.mode = sting_to_relay_mode[settings.value("MODE", "OFF").toString()];
+		tmp.state = settings.value("STATE", "OFF").toString() == "ON";
 		tmp.gpio = settings.value("GPIO", 0).toInt();
 		tmp.pulse_off = settings.value("PULSE_OFF", 0).toInt() * 1000;
 		tmp.pulse_on = settings.value("PULSE_ON", 0).toInt() * 1000;
@@ -61,15 +53,36 @@ QVector<relay_cfg> env::get_relay(void)
 
 		settings.endGroup();
 
-		ret.push_back(tmp);
+		ret[i] = tmp;
 	}
 
 	return ret;
 }
 
-void env::set_relay(QVector<relay_cfg>)
+void env::set_relay(QMap<int, relay_cfg> in)
 {
+	int count = settings.value("RELAY_COUNT", 0).toInt();
 
+	for (int i = 0; i < count; i++)
+	{
+		if (in.keys().contains(i))
+		{
+			settings.beginGroup(QString("RELAY%1").arg(i));
+
+			settings.setValue("MODE", sting_to_relay_mode.key(in[i].mode));
+			settings.setValue("STATE", in[i].state ? "ON" : "OFF");
+			settings.setValue("GPIO", in[i].gpio);
+			settings.setValue("PULSE_OFF", in[i].pulse_off / 1000);
+			settings.setValue("PULSE_ON", in[i].pulse_on / 1000);
+
+			QStringList timeline;
+			for (const auto & key : in[i].timeline.keys())
+				timeline.append(key.toString("hh:mm:ss") + "." + (in[i].timeline[key] ? "ON" : "OFF"));
+			settings.setValue("TIMELINE", timeline.join(","));
+
+			settings.endGroup();
+		}
+	}
 }
 
 void env::set_global(global_conf conf)
