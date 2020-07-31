@@ -20,8 +20,7 @@ bool app::args()
 app::app(int argc, char *argv[]) :
 	QCoreApplication(argc, argv),
 	_args_init(args()),
-	_env(_args.value("c")),
-	_relay(_env.get_relay())
+	_env(_args.value("c"))
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(_args.isSet("use-system-proxy"));
 	QProcess::execute(QString("ln -sf /usr/share/zoneinfo/uclibc/%1 /etc/TZ").arg(_env.get_global().timezone));
@@ -53,7 +52,7 @@ app::app(int argc, char *argv[]) :
 
 void app::on_timeout(void)
 {
-	_relay = _env.get_relay();
+	auto _relay = _env.get_relay();
 //	qDebug() << QTime::currentTime();
 	for (const auto & i : _relay.keys())
 	{
