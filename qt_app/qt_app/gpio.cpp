@@ -38,6 +38,7 @@ void gpio::set_value(int num, bool state)
 {
 	states[num] = state;
 }
+
 #else
 bool gpio::get_value(int num)
 {

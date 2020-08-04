@@ -8,6 +8,7 @@
 #include <QDir>
 
 #include "endpoint_base.h"
+#include "gpio.h"
 
 class StaticEnpoint : public endpoint_base
 {

@@ -51,6 +51,14 @@ public:
 	global_conf get_global(void);
 	logger * get_logger(void);
 
+	const QMap<QString, LogLevel> string_to_level =
+	{
+		{ "OFF", LogLevel::OFF },
+		{ "ERROR", LogLevel::ERROR },
+		{ "WARNING", LogLevel::WARNING },
+		{ "INFORM", LogLevel::INFORM },
+		{ "DEBUG", LogLevel::DEBUG },
+	};
 	const QMap<QString, relay_mode_t> sting_to_relay_mode =
 	{
 		{ "OFF", relay_mode_t::OFF },

@@ -4,7 +4,9 @@
 #include <QFile>
 #include <QMAp>
 
+#ifdef _WIN32
 #define NO_GPIO
+#endif
 
 class gpio
 {

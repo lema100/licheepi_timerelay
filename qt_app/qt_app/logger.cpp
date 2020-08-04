@@ -16,12 +16,10 @@ inline logger & logger::log(const QString & value, LogLevel level)
 		QMutexLocker locker(&_mutex);
 		QTextStream ts(&_outFile);
 		//QTextStream stream(stdout);
-		//QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss,zzz") <<
 		if(level == LogLevel::INFORM)
 			ts << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss,zzz") << " " << value << "\r\n";
 		else
 			ts << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss,zzz") << " " << hex << QThread::currentThreadId() << dec << " " << levelToString(level) << " " << value << "\r\n";
-		//ts.flush();
 		ts.flush();
 	}
 	return *this;

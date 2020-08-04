@@ -5,19 +5,27 @@ endpoint_base::result RelayEnpoint::get(void)
 	QJsonObject jObj;
 
 	auto relays = _env->get_relay();
-	for (const auto & i : relays.keys())
+	if (_args.contains("state"))
 	{
-		QJsonObject jObj_tmp, jObj_timeline;
+		for (const auto & i : relays.keys())
+			jObj[QString::number(i)] = gpio::get_value(relays[i].gpio) ? "ON" : "OFF";
+	}
+	else
+	{
+		for (const auto & i : relays.keys())
+		{
+			QJsonObject jObj_tmp, jObj_timeline;
 
-		jObj_tmp["gpio"] = relays[i].gpio;
-		jObj_tmp["state"] = relays[i].state ? "ON" : "OFF";
-		jObj_tmp["mode"] = _env->sting_to_relay_mode.key(relays[i].mode);
-		jObj_tmp["pulse off"] = relays[i].pulse_off / 1000;
-		jObj_tmp["pulse on"] = relays[i].pulse_on / 1000;
-		for (const auto & j : relays[i].timeline.keys())
-			jObj_timeline[j.toString("hh:mm:ss")] = relays[i].timeline[j] ? "ON" : "OFF";
-		jObj_tmp["timeline"] = jObj_timeline;
-		jObj[QString::number(i)] = jObj_tmp;
+			jObj_tmp["gpio"] = relays[i].gpio;
+			jObj_tmp["state"] = relays[i].state ? "ON" : "OFF";
+			jObj_tmp["mode"] = _env->sting_to_relay_mode.key(relays[i].mode);
+			jObj_tmp["pulse off"] = relays[i].pulse_off / 1000;
+			jObj_tmp["pulse on"] = relays[i].pulse_on / 1000;
+			for (const auto & j : relays[i].timeline.keys())
+				jObj_timeline[j.toString("hh:mm:ss")] = relays[i].timeline[j] ? "ON" : "OFF";
+			jObj_tmp["timeline"] = jObj_timeline;
+			jObj[QString::number(i)] = jObj_tmp;
+		}
 	}
 
 	return {qhttp::TStatusCode::ESTATUS_OK, {}, jDoc_data(jObj)};

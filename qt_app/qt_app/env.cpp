@@ -2,15 +2,6 @@
 
 env::env(const QString & iniFile) : settings(iniFile, QSettings::IniFormat, nullptr)
 {
-	QMap<QString, LogLevel> string_to_level =
-	{
-		{ "OFF", LogLevel::OFF },
-		{ "ERROR", LogLevel::ERROR },
-		{ "WARNING", LogLevel::WARNING },
-		{ "INFORM", LogLevel::INFORM },
-		{ "DEBUG", LogLevel::DEBUG },
-	};
-
 	_logger = new logger(settings.value("LOG_FILE_PATH", iniFile.split(".").first() + ".log").toString(), "");
 	_logger->set_log_level(string_to_level[settings.value("LOG_LEVEL", "OFF").toString()]);
 }
