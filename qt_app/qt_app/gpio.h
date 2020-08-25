@@ -2,7 +2,7 @@
 #define GPIO_H
 
 #include <QFile>
-#include <QMAp>
+#include <QMap>
 
 #ifdef _WIN32
 #define NO_GPIO

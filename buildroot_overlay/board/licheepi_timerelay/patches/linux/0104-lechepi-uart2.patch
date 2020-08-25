@@ -1,0 +1,29 @@
+--- a/arch/arm/boot/dts/sun8i-v3s.dtsi
++++ b/arch/arm/boot/dts/sun8i-v3s.dtsi
+@@ -315,6 +315,11 @@
+ 				function = "uart1";
+ 			};
+ 
++			uart2_pb_pins: uart2-pb-pins {
++				pins = "PB0", "PB1";
++				function = "uart2";
++			};
++
+ 			mmc0_pins: mmc0-pins {
+ 				pins = "PF0", "PF1", "PF2", "PF3",
+ 				       "PF4", "PF5";
+--- a/arch/arm/boot/dts/sun8i-v3s-licheepi-zero-dock.dts
++++ b/arch/arm/boot/dts/sun8i-v3s-licheepi-zero-dock.dts
+@@ -69,6 +69,12 @@
+ 	status = "okay";
+ };
+ 
++&uart2 {
++	pinctrl-0 = <&uart2_pb_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++};
++
+ &spi0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&spi0_pins>;
