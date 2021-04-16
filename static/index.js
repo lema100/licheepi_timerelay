@@ -50,16 +50,19 @@ class index
 	}
 	redraw()
 	{
-		let page = this.get_query("menu");
-		let main_area = document.getElementById('__main_area');
-		if (page == 'home')
+		let _page = this.get_query("menu");
+		let _html = $('#__main_area').empty();
+		_html.append($('<br>'));
+		if (_page == 'home')
 		{
-			main_area.innerHTML = '123';
+			_html.append($('h3').text("Home page"));
 		}
-		else if (page == 'system')
+		else if (_page == 'system')
 		{
-			main_area.innerHTML = '123123';
+			_html.append($('h3').text("System page"));
 		}
+		else
+			_html.append($('h3').text("Unknown page"));
 	}
 }
 
