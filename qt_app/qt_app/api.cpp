@@ -52,6 +52,7 @@ std::function<void(void)> api::get_func(void)
 						_res->addHeaderValue("content-type", QString("application/json"));
 					for(auto key : res._headers.keys())
 						_res->addHeaderValue(key.toLatin1(), res._headers[key]);
+					_res->addHeader("Access-Control-Allow-Origin", "*");
 					_res->setStatusCode(res._status);
 					_res->end(res._body);
 
