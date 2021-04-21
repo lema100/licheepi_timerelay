@@ -3,10 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="e51ab958-30df-4f6a-a2b0-acfed84f7be6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/icon/envelope-solid.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icon/github-brands.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icon/skype-brands.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icon/telegram-brands.svg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -50,7 +46,7 @@
       <updated>1618492255964</updated>
       <workItem from="1618492258509" duration="37000" />
       <workItem from="1618492296588" duration="36117000" />
-      <workItem from="1618811720836" duration="72707000" />
+      <workItem from="1618811720836" duration="73005000" />
     </task>
     <servers />
   </component>
