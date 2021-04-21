@@ -33,6 +33,7 @@ app::app(int argc, char *argv[]) :
 			std::make_shared<SelfKillEndpoint>(),
 			std::make_shared<SettingEnpoint>(),
 			std::make_shared<RelayEnpoint>(),
+			std::make_shared<EthEnpoint>(),
 			std::make_shared<StaticEnpoint>(),
 		};
 		new api(req, res, &_env, list);

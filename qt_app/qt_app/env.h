@@ -19,6 +19,14 @@ struct endpoint_config
 {
 };
 
+struct eth_cfg
+{
+	bool dhcp;
+	QString ip;
+	QString mask;
+	QString gateway;
+};
+
 struct relay_cfg
 {
 	int gpio;
@@ -33,6 +41,7 @@ struct global_conf
 	int gpio_red, gpio_green;
 	int relay_count;
 	QString timezone;
+	QStringList timezone_list;
 	int http_port;
 };
 
@@ -49,6 +58,10 @@ public:
 
 	void set_global(global_conf);
 	global_conf get_global(void);
+
+	void set_eth(eth_cfg);
+	eth_cfg get_eth(void);
+
 	logger * get_logger(void);
 
 	const QMap<QString, LogLevel> string_to_level =

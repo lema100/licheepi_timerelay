@@ -1,0 +1,8 @@
+.fixed_w100px
+{
+	width: 100px;
+}
+.invert_color
+{
+	filter: invert(100%);
+}

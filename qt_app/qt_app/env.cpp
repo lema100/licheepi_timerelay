@@ -91,9 +91,38 @@ global_conf env::get_global(void)
 
 	ret.relay_count = settings.value("RELAY_COUNT", 0).toInt();
 	ret.timezone = settings.value("TIMEZONE", "UTC").toString();
+	ret.timezone_list = settings.value("TIMEZONE_LIST", "UTC-4,UTC-3,UTC-2,UTC-1,UTC,UTC+1,UTC+2,UTC+3,UTC+4").toString().split(",");
 	ret.gpio_red = settings.value("GPIO_RED", 0).toInt();
 	ret.gpio_green = settings.value("GPIO_GREEN", 0).toInt();
 	ret.http_port = settings.value("HTTP_PORT", 8000).toInt();
+
+	return ret;
+}
+
+void env::set_eth(eth_cfg conf)
+{
+	settings.beginGroup("ETHERNET");
+
+	settings.setValue("DHCP", conf.dhcp);
+	settings.setValue("IP", conf.ip);
+	settings.setValue("MASK", conf.mask);
+	settings.setValue("GATEWAY", conf.gateway);
+
+	settings.endGroup();
+}
+
+eth_cfg env::get_eth(void)
+{
+	eth_cfg ret;
+
+	settings.beginGroup("ETHERNET");
+
+	ret.dhcp = settings.value("DHCP", false).toBool();
+	ret.ip = settings.value("IP", "192.168.0.100").toString();
+	ret.mask = settings.value("MASK", "255.255.255.0").toString();
+	ret.gateway = settings.value("GATEWAY", "192.168.0.1").toString();
+
+	settings.endGroup();
 
 	return ret;
 }

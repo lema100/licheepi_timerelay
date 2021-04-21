@@ -1,46 +1,41 @@
+import api from './api.js'
+
 class index
 {
-	api_path = 'http://localhost:8000/api/';
+	api;
+	ethernet;
 	setting;
+	relay_state;
 	relay;
 
 	constructor()
 	{
+		this.api = new api();
 		let ctx = this;
-		this.get_relay(function (data)
+		this.api.get_eth(function (data)
+		{
+			ctx.ethernet = data;
+			ctx.redraw();
+			console.log(data);
+		});
+		this.api.get_relay(function (data)
 		{
 			ctx.relay = data;
 			ctx.redraw();
 			console.log(data);
 		});
-		this.get_setting(function (data)
+		this.api.get_relay_state(function (data)
+		{
+			ctx.relay_state = data;
+			ctx.redraw();
+			console.log(data);
+		});
+		this.api.get_setting(function (data)
 		{
 			ctx.setting = data;
 			ctx.redraw();
 			console.log(data);
 		});
-	}
-	get_relay(fn)
-	{
-		$.ajax(
-			this.api_path + 'relay',
-			{
-				type: 'GET',
-				crossDomain: true,
-				success: fn
-			}
-		);
-	}
-	get_setting(fn)
-	{
-		$.ajax(
-			this.api_path + 'setting',
-			{
-				type: 'GET',
-				crossDomain: true,
-				success: fn
-			}
-		);
 	}
 	get_query(name, url = window.location.href)
 	{
@@ -61,7 +56,7 @@ class index
 	}
 	update_params(ctx, id)
 	{
-		console.log("updated params " + id);
+		console.log("Updated params from id:" + id);
 		let id_split = id.replaceAll("-", ":").split("_");
 		let elem = $("#" + id);
 		let _relay = ctx.relay["data"][id_split[0]];
@@ -127,6 +122,61 @@ class index
 		}
 		ctx.redraw();
 	}
+	update_setting(ctx, id)
+	{
+		console.log("Updated params from id:" + id);
+		let ip_patt = /\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/;
+
+		let sett = this.setting["data"];
+		let eth = this.ethernet["data"];
+		let elem = $("#" + id);
+		let val_int = parseInt(elem.val())
+		let ip_test = ip_patt.test(elem.val());
+
+		switch (id)
+		{
+			case "inputGPIO1":
+				if (!isNaN(val_int))
+					sett["GPIO green led"] = val_int;
+				break;
+			case "inputGPIO2":
+				if (!isNaN(val_int))
+					sett["GPIO red led"] = val_int;
+				break;
+			case "inputHTTPport":
+				if (!isNaN(val_int))
+					sett["HTTP port"] = val_int;
+				break;
+			case "inputRelayCount":
+				if (!isNaN(val_int))
+					sett["Relay count"] = val_int;
+				break;
+			case "inputModeTZ":
+				sett["Timezone"] = elem.val();
+				break;
+			case "inputIP":
+				if (ip_test)
+					eth["IP"] = elem.val();
+				break;
+			case "inputMASK":
+				if (ip_test)
+					eth["MASK"] = elem.val();
+				break;
+			case "inputGATEWAY":
+				if (ip_test)
+					eth["GATEWAY"] = elem.val();
+				break;
+			case "inlineRadioDHCP":
+				eth["DHCP"] = true;
+				break;
+			case "inlineRadioStatic":
+				eth["DHCP"] = false;
+				break;
+			default:
+				break;
+		}
+		ctx.redraw();
+	}
 	redraw()
 	{
 		let _ctx = this;
@@ -136,32 +186,151 @@ class index
 
 		if (_page == 'system')
 		{
-			_html.append($('<h3>').text("System page"));
+			if (typeof this.setting !== 'object' || this.setting === null)
+				return;
+			if (typeof this.ethernet !== 'object' || this.ethernet === null)
+				return;
+			let _sett = this.setting["data"];
+			let _eth = this.ethernet["data"];
+			if (typeof _sett === 'object' && _sett !== null)
+			{
+				_html.append($('<h4>').text("System"));
+				console.log(JSON.stringify(this.setting));
+
+				let inputs = [
+					["GPIO LED 1", "inputGPIO1", "GPIO green led"],
+					["GPIO LED 2", "inputGPIO2", "GPIO red led"],
+					["HTTP port", "inputHTTPport", "HTTP port"],
+					["Relay count", "inputRelayCount", "Relay count"],
+//					["Timezone", "inputTimezone", "Timezone"],
+				];
+
+				for (let i of inputs) {
+					let div = $("<div>", {"class": "input-group mb-1 w-50"});
+					div.append($("<div>", {"class": "input-group-prepend w-50"})
+						.append($("<span>", {"class": "input-group-text w-100", "text": i[0]}))
+					);
+					div.append($("<input>", {
+						"id": i[1],
+						"class": "form-control",
+						"type": "text",
+						"value": _sett[i[2]]
+					}).change(function () {
+						_ctx.update_setting(_ctx, this.id);
+					}));
+					_html.append(div);
+				}
+
+				let div_TZ = $("<div>", {"class" : "input-group mb-1 w-50"});
+				div_TZ.append($("<div>", {"class" : "input-group-prepend w-50"})
+					.append($("<div>", {"class" : "input-group-text w-100", "for" : "inputModeTZ", "text" : "Timezone"}))
+				);
+				let sel_TZ = ($("<select>", {"class" : "custom-select", "id" : "inputModeTZ"}));
+				for (let i of _sett["Timezone list"])
+					sel_TZ.append($("<option>", {"value" : i, "text" : i}));
+				sel_TZ.change(function () {_ctx.update_setting(_ctx, this.id);}).val(_sett["Timezone"]);
+
+				div_TZ.append(sel_TZ);
+				_html.append(div_TZ);
+				_html.append($("<br>"));
+			}
+
+			if (typeof _eth === 'object' && _eth !== null)
+			{
+				_html.append($('<h4>').text("Ethernet"));
+				console.log(JSON.stringify(this.ethernet));
+
+				let div_dhcp = $("<div>", {"class": "form-check form-check-inline w-25"});
+				div_dhcp.append($("<input>", {
+					"class": "form-check-input",
+					"type": "radio",
+					"name": "inlineRadioOptions",
+					"id": "inlineRadioDHCP",
+					"value": true
+				}).change(function () {
+					_ctx.update_setting(_ctx, this.id);
+				}));
+				div_dhcp.append($("<label>", {
+					"class": "form-check-label",
+					"for": "inlineRadioDHCP",
+					"text": "DHCP"
+				}));
+				let div_static = $("<div>", {"class": "form-check form-check-inline w-25"});
+				div_static.append($("<input>", {
+					"class": "form-check-input",
+					"type": "radio",
+					"name": "inlineRadioOptions",
+					"id": "inlineRadioStatic",
+					"value": false
+				}).change(function () {
+					_ctx.update_setting(_ctx, this.id);
+				}));
+				div_static.append($("<label>", {
+					"class": "form-check-label",
+					"for": "inlineRadioStatic",
+					"text": "STATIC"
+				}));
+				_html.append(div_dhcp);
+				_html.append(div_static);
+
+				if (_eth["DHCP"])
+					$("#inlineRadioDHCP").attr("checked", "checked");
+				else
+					$("#inlineRadioStatic").attr("checked", "checked");
+
+				let inputs_eth = [
+					["IP", "inputIP", "IP"],
+					["MASK", "inputMASK", "MASK"],
+					["GATEWAY", "inputGATEWAY", "GATEWAY"]
+				];
+
+				for (let i of inputs_eth) {
+					let div = $("<div>", {"class": "input-group mb-1 w-50"});
+					div.append($("<div>", {"class": "input-group-prepend w-50"})
+						.append($("<span>", {"class": "input-group-text w-100", "text": i[0]}))
+					);
+					div.append($("<input>", {
+						"id": i[1],
+						"class": "form-control",
+						"type": "text",
+						"value": _eth[i[2]],
+						"disabled": _eth["DHCP"]
+					}).change(function () {
+						_ctx.update_setting(_ctx, this.id);
+					}));
+					_html.append(div);
+				}
+				_html.append($("<br>"));
+				_html.append($('<p>', {"class" : "text-danger", "text" : "Note: Timezone, HTTP port and Ethernet setting take effect only after APPLY and REBOOT"}))
+			}
 		}
 		else if (_page == "relays")
 		{
+			if (typeof this.relay !== 'object' || this.relay === null)
+				return;
+
 			for (let key in this.relay["data"])
 			{
 				let _relay = this.relay["data"][key];
 				if (typeof _relay === 'object' && _relay !== null)
 				{
-					_html.append(JSON.stringify(_relay));
+					console.log(JSON.stringify(_relay));
 					_html.append($("<h4>", {"text" : "Relay " + key}))
-					let div_mode = $("<div>", {"class" : "input-group mb-1 w-100"});
-					div_mode.append($("<div>", {"class" : "input-group-prepend w-25"})
+					let div_mode = $("<div>", {"class" : "input-group mb-1 w-50"});
+					div_mode.append($("<div>", {"class" : "input-group-prepend w-50"})
 						.append($("<div>", {"class" : "input-group-text w-100", "for" : key + "_inputMode", "text" : "Mode"}))
 					);
 					div_mode.append($("<select>", {"class" : "custom-select", "id" : key + "_inputMode"})
 						.append($("<option>", {"value" : "TIME", "text" : "TIME"}))
 						.append($("<option>", {"value" : "MANUAL", "text" : "MANUAL"}))
-						.append($("<option>", {"value" : "PULSE", "text" : "PULSE"}))
+//						.append($("<option>", {"value" : "PULSE", "text" : "PULSE"}))
 						.append($("<option>", {"value" : "PWM", "text" : "PWM"}))
 						.append($("<option>", {"value" : "OFF", "text" : "OFF"}))
 						.change(function () {_ctx.update_params(_ctx, this.id);})
 						.val(_relay["mode"])
 					);
-					let div_gpio = $("<div>", {"class" : "input-group mb-1 w-100"});
-					div_gpio.append($("<div>", {"class" : "input-group-prepend w-25"})
+					let div_gpio = $("<div>", {"class" : "input-group mb-1 w-50"});
+					div_gpio.append($("<div>", {"class" : "input-group-prepend w-50"})
 						.append($("<span>", {"class" : "input-group-text w-100", "text" : "GPIO"}))
 					);
 					div_gpio.append($("<input>", {
@@ -203,8 +372,8 @@ class index
 							_html.append($("<br>"));
 							break;
 						case "PWM":
-							let div_pulse_on = $("<div>", {"class" : "input-group mb-1 w-100"});
-							div_pulse_on.append($("<div>", {"class" : "input-group-prepend w-25"})
+							let div_pulse_on = $("<div>", {"class" : "input-group mb-1 w-50"});
+							div_pulse_on.append($("<div>", {"class" : "input-group-prepend w-50"})
 								.append($("<span>", {"class" : "input-group-text w-100", "text" : "Pulse ON"}))
 							);
 							div_pulse_on.append($("<input>", {
@@ -214,8 +383,8 @@ class index
 								"value" : _relay["pulse on"]
 							}).change(function () {_ctx.update_params(_ctx, this.id);}));
 
-							let div_pulse_off = $("<div>", {"class" : "input-group mb-1 w-100"});
-							div_pulse_off.append($("<div>", {"class" : "input-group-prepend w-25"})
+							let div_pulse_off = $("<div>", {"class" : "input-group mb-1 w-50"});
+							div_pulse_off.append($("<div>", {"class" : "input-group-prepend w-50"})
 								.append($("<span>", {"class" : "input-group-text w-100", "text" : "Pulse OFF"}))
 							);
 							div_pulse_off.append($("<input>", {
@@ -248,14 +417,14 @@ class index
 								let delete_btn = $("<button>", {
 									"type" : "button",
 									"id" : key + "_inputTimeDelete_" + time.replaceAll(":", "-"),
-									"class" : "btn btn-outline-danger w-50",
+									"class" : "btn btn-outline-danger w-50 text-truncate",
 									"text" : "DELETE",
 								}).click(function () {_ctx.update_params(_ctx, this.id);});
 
 								let append_btn = $("<button>", {
 									"type" : "button",
 									"id" : key + "_inputTimeAppend_" + time.replaceAll(":", "-"),
-									"class" : "btn btn-outline-success w-50",
+									"class" : "btn btn-outline-success w-50 text-truncate",
 									"text" : "APPEND",
 								}).click(function () {_ctx.update_params(_ctx, this.id);});
 
@@ -291,7 +460,46 @@ class index
 			}
 		}
 		else
-			_html.append($('<h3>').text("Home page"));
+		{
+			if (typeof this.relay_state !== 'object' || this.relay_state === null)
+				return;
+			if (typeof this.setting !== 'object' || this.setting === null)
+				return;
+
+			let _relay_state = this.relay_state["data"];
+			let _sett = this.setting["data"];
+
+			_html.append($('<h4>').text("Home"));
+
+			let div = $("<div>", {"class": "input-group mb-1 w-50"});
+			div.append($("<div>", {"class": "input-group-prepend w-50"})
+				.append($("<span>", {"class": "input-group-text w-100", "text": "Date/Time UTC"}))
+			);
+			div.append($("<input>", {
+				"id": "TimeFateUTC",
+				"class": "form-control",
+				"type": "text",
+				"value": _sett["Current time UTC"],
+				"disabled": true
+			}));
+			_html.append(div);
+
+			for (let i in _relay_state)
+			{
+				let div = $("<div>", {"class": "input-group mb-1 w-50"});
+				div.append($("<div>", {"class": "input-group-prepend w-50"})
+					.append($("<span>", {"class": "input-group-text w-100", "text": "Relay " + i}))
+				);
+				div.append($("<input>", {
+					"id": "relayState" + i,
+					"class": "form-control" + (_relay_state[i] == "ON" ? " text-success" : " text-danger"),
+					"type": "text",
+					"value": _relay_state[i],
+					"disabled": true
+				}));
+				_html.append(div);
+			}
+		}
 	}
 }
 

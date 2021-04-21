@@ -70,13 +70,19 @@ endpoint_base::result RelayEnpoint::post(void)
 endpoint_base::result SettingEnpoint::get(void)
 {
 	QJsonObject jObj;
+	QJsonArray jArrTZ;
 
 	auto conf = _env->get_global();
+	for (const auto & i : conf.timezone_list)
+		jArrTZ << i;
+
 	jObj["GPIO green led"] = conf.gpio_green;
 	jObj["GPIO red led"] = conf.gpio_red;
 	jObj["Relay count"] = conf.relay_count;
 	jObj["Timezone"] = conf.timezone;
 	jObj["HTTP port"] = conf.http_port;
+	jObj["Timezone list"] = jArrTZ;
+	jObj["Current time UTC"] = QDateTime::currentDateTimeUtc().toString("yyyy.MM.dd hh:mm:ss");
 
 	return {qhttp::TStatusCode::ESTATUS_OK, {}, jDoc_data(jObj)};
 }
@@ -128,6 +134,37 @@ endpoint_base::result StaticEnpoint::get(void)
 	}
 
 	return {qhttp::TStatusCode::ESTATUS_NOT_FOUND, {}, jDoc_error("Unavailable path: " + filePath)};
+}
+
+endpoint_base::result EthEnpoint::post(void)
+{
+	QJsonObject jObj = QJsonDocument::fromJson(_body).object();
+
+	auto conf = _env->get_eth();
+	if (jObj.contains("DHCP"))
+		conf.dhcp = jObj["DHCP"].toInt();
+	if (jObj.contains("IP"))
+		conf.ip = jObj["IP"].toInt();
+	if (jObj.contains("MASK"))
+		conf.mask = jObj["MASK"].toInt();
+	if (jObj.contains("GATEWAY"))
+		conf.gateway = jObj["GATEWAY"].toString();
+	_env->set_eth(conf);
+
+	return {qhttp::TStatusCode::ESTATUS_OK, {}, jDoc_data(jObj)};
+}
+
+endpoint_base::result EthEnpoint::get(void)
+{
+	QJsonObject jObj;
+
+	auto conf = _env->get_eth();
+	jObj["DHCP"] = conf.dhcp;
+	jObj["IP"] = conf.ip;
+	jObj["MASK"] = conf.mask;
+	jObj["GATEWAY"] = conf.gateway;
+
+	return {qhttp::TStatusCode::ESTATUS_OK, {}, jDoc_data(jObj)};
 }
 
 endpoint_base::result TestEnpoint::get(void)
