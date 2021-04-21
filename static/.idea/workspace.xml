@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="e51ab958-30df-4f6a-a2b0-acfed84f7be6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +45,7 @@
       <updated>1618492255964</updated>
       <workItem from="1618492258509" duration="37000" />
       <workItem from="1618492296588" duration="36117000" />
-      <workItem from="1618811720836" duration="73005000" />
+      <workItem from="1618811720836" duration="73570000" />
     </task>
     <servers />
   </component>
@@ -74,17 +73,5 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="623" y="239" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/-1920.0.1536.824@0.0.1920.1040" timestamp="1618812026183" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/index.js</url>
-          <line>11</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
