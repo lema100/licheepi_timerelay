@@ -69,6 +69,20 @@ public:
 	}
 };
 
+class RebootEnpoint : public endpoint_base
+{
+public:
+	result get(void) override;
+	QList<qhttp::THttpMethod> methods(void) override
+	{
+		return {qhttp::THttpMethod::EHTTP_GET};
+	}
+	QString path(void) override
+	{
+		return "/api/reboot";
+	}
+};
+
 class TestEnpoint : public endpoint_base
 {
 public:

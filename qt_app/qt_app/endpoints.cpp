@@ -7,8 +7,19 @@ endpoint_base::result RelayEnpoint::get(void)
 	auto relays = _env->get_relay();
 	if (_args.contains("state"))
 	{
-		for (const auto & i : relays.keys())
-			jObj[QString::number(i)] = gpio::get_value(relays[i].gpio) ? "ON" : "OFF";
+		if (_args.contains("relay"))
+		{
+			if (_args["state"].first() == "ON" || _args["state"].first() == "OFF")
+			{
+				relays[_args["relay"].first().toInt()].state = (_args["state"].first() == "ON") ? true : false;
+				_env->set_relay(relays);
+			}
+		}
+		else
+		{
+			for (const auto & i : relays.keys())
+				jObj[QString::number(i)] = gpio::get_value(relays[i].gpio) ? "ON" : "OFF";
+		}
 	}
 	else
 	{
@@ -49,9 +60,9 @@ endpoint_base::result RelayEnpoint::post(void)
 			if (jRelay.contains("mode"))
 				relays[i].mode = _env->sting_to_relay_mode[jRelay["mode"].toString()];
 			if (jRelay.contains("pulse off"))
-				relays[i].pulse_off = jRelay["pulse_off"].toInt() * 1000;
+				relays[i].pulse_off = jRelay["pulse off"].toInt() * 1000;
 			if (jRelay.contains("pulse on"))
-				relays[i].pulse_on = jRelay["pulse_on"].toInt() * 1000;
+				relays[i].pulse_on = jRelay["pulse on"].toInt() * 1000;
 			if (jRelay.contains("timeline"))
 			{
 				QMap<QTime, bool> timeline;
@@ -142,11 +153,11 @@ endpoint_base::result EthEnpoint::post(void)
 
 	auto conf = _env->get_eth();
 	if (jObj.contains("DHCP"))
-		conf.dhcp = jObj["DHCP"].toInt();
+		conf.dhcp = jObj["DHCP"].toBool();
 	if (jObj.contains("IP"))
-		conf.ip = jObj["IP"].toInt();
+		conf.ip = jObj["IP"].toString();
 	if (jObj.contains("MASK"))
-		conf.mask = jObj["MASK"].toInt();
+		conf.mask = jObj["MASK"].toString();
 	if (jObj.contains("GATEWAY"))
 		conf.gateway = jObj["GATEWAY"].toString();
 	_env->set_eth(conf);
@@ -165,6 +176,12 @@ endpoint_base::result EthEnpoint::get(void)
 	jObj["GATEWAY"] = conf.gateway;
 
 	return {qhttp::TStatusCode::ESTATUS_OK, {}, jDoc_data(jObj)};
+}
+
+endpoint_base::result RebootEnpoint::get(void)
+{
+	qDebug() << "Reboot request";
+	return {qhttp::TStatusCode::ESTATUS_OK, {}, jDoc_info("Reboot started")};
 }
 
 endpoint_base::result TestEnpoint::get(void)

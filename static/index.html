@@ -24,7 +24,6 @@
 -->
 		<a class="nav-link mr-auto" href="mailto:lema_01_@mail.ru"><img class="invert_color" src="./img/envelope-solid.svg" width="32px" height="32px"></a>
 
-
 		<button class="navbar-toggler mb-1" type="button" data-toggle="collapse" data-target="#navbars00" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -38,12 +37,12 @@
 					<a class="nav-link" href="?menu=relays">Relays</a>
 				</li>
 				<li>
-					<button class="btn btn-outline-success px-3 mx-3 mb-1 fixed_w100px" type="submit" data-toggle="modal" data-target="#applyModal">
+					<button class="btn btn-outline-success px-3 mx-3 mb-1 fixed_w100px" id="btnApply">
 						APPLY
 					</button>
 				</li>
 				<li>
-					<button class="btn btn-outline-danger px-3 mx-3 mb-1 fixed_w100px" type="submit" data-toggle="modal" data-target="#rebootModal">
+					<button class="btn btn-outline-danger px-3 mx-3 mb-1 fixed_w100px" id="btnReboot">
 						REBOOT
 					</button>
 				</li>
@@ -52,33 +51,12 @@
 	</div>
 </nav>
 
+<div class="alert alert-success" role="alert" id="splashAlert">
+	<div class="container" id="splashAlertDiv">
+	</div>
+</div>
+
 <div class="container" id="__main_area">
-</div>
-
-<div class="modal fade" id="applyModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h3 class="modal-title">Applied success</h3>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-success px-5" data-dismiss="modal">OK</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="rebootModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h3 class="modal-title">Reboot success</h3>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-success px-5" data-dismiss="modal">OK</button>
-			</div>
-		</div>
-	</div>
 </div>
 
 </body>
