@@ -139,6 +139,8 @@ endpoint_base::result StaticEnpoint::get(void)
 				headers["content-type"] = "text/html;charset=utf-8";
 			if (fi.fileName().endsWith("css"))
 				headers["content-type"] = "text/css";
+                        if (fi.fileName().endsWith("svg"))
+                                headers["content-type"] = "image/svg+xml";
 
 			return {qhttp::TStatusCode::ESTATUS_OK, headers, fdata};
 		}

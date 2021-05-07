@@ -42,9 +42,9 @@ void gpio::set_value(int num, bool state)
 #else
 bool gpio::get_value(int num)
 {
-	f_write("/sys/class/gpio/export", QString::number(num));
-	f_write(QString("/sys/class/gpio/gpio%1/direction").arg(num), QString("in").toLatin1());
-	return f_read("/sys/class/gpio/gpio%1/value").contains("1") ? true : false;
+//	f_write("/sys/class/gpio/export", QString::number(num));
+//	f_write(QString("/sys/class/gpio/gpio%1/direction").arg(num), QString("in").toLatin1());
+	return f_read(QString("/sys/class/gpio/gpio%1/value").arg(num)).contains("1") ? true : false;
 }
 
 void gpio::set_value(int num, bool state)

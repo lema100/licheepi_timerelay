@@ -1,6 +1,6 @@
 class api
 {
-	api_path = 'http://localhost:8000/api/';
+	api_path = '../api/';
 	timeout = 1000;
 
 	constructor()
