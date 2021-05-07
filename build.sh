@@ -2,6 +2,7 @@
 git submodule init
 git submodule update
 cp -rp buildroot_overlay/* buildroot/
+cp -rp static buildroot/board/licheepi_timerelay/overlay/root
 cd buildroot
 make licheepi_timerelay_defconfig
 make -j 4
